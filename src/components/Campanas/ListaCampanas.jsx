@@ -1,0 +1,165 @@
+import { useState } from 'react'
+import { useCampanas } from '../../hooks/useDatabase.jsx'
+import { Megaphone, Plus, Calendar, X, Check } from 'lucide-react'
+
+export default function ListaCampanas() {
+  const { campanas, loading, crearCampana } = useCampanas()
+  const [showForm, setShowForm] = useState(false)
+  const [formData, setFormData] = useState({
+    nombre: '',
+    descripcion: '',
+    fecha_inicio: '',
+    fecha_fin: ''
+  })
+  const [loadingCreate, setLoadingCreate] = useState(false)
+  const [error, setError] = useState('')
+
+  function handleChange(e) {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setError('')
+    setLoadingCreate(true)
+    try {
+      await crearCampana({
+        nombre: formData.nombre,
+        descripcion: formData.descripcion,
+        fecha_inicio: formData.fecha_inicio,
+        fecha_fin: formData.fecha_fin || null,
+        activa: true
+      })
+      setFormData({ nombre: '', descripcion: '', fecha_inicio: '', fecha_fin: '' })
+      setShowForm(false)
+    } catch (err) {
+      setError(err.message || 'Error al crear campana')
+    } finally {
+      setLoadingCreate(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Campanas</h1>
+          <p className="text-gray-500">{campanas.length} campanas registradas</p>
+        </div>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+        >
+          {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+          {showForm ? 'Cancelar' : 'Nueva Campana'}
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Crear Campana</h3>
+          {error && <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">{error}</div>}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+              <input
+                type="text"
+                name="nombre"
+                value={formData.nombre}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                placeholder="Campana de Acopio Navidena"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Descripcion</label>
+              <textarea
+                name="descripcion"
+                value={formData.descripcion}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                rows="2"
+                placeholder="Descripcion de la campana..."
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Inicio *</label>
+                <input
+                  type="date"
+                  name="fecha_inicio"
+                  value={formData.fecha_inicio}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Fin</label>
+                <input
+                  type="date"
+                  name="fecha_fin"
+                  value={formData.fecha_fin}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={loadingCreate}
+              className="w-full bg-emerald-600 text-white py-2 rounded-lg font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {loadingCreate ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  Crear Campana
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {campanas.map(campana => (
+          <div key={campana.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <Megaphone className="w-6 h-6 text-blue-600" />
+              </div>
+              <span className={campana.activa ? 'bg-green-100 text-green-800 px-2.5 py-0.5 rounded-full text-xs font-medium' : 'bg-gray-100 text-gray-800 px-2.5 py-0.5 rounded-full text-xs font-medium'}>
+                {campana.activa ? 'Activa' : 'Inactiva'}
+              </span>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{campana.nombre}</h3>
+            {campana.descripcion && (
+              <p className="text-sm text-gray-500 mb-3">{campana.descripcion}</p>
+            )}
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Calendar className="w-4 h-4" />
+              <span>{new Date(campana.fecha_inicio).toLocaleDateString()}</span>
+              {campana.fecha_fin && (
+                <>
+                  <span>-</span>
+                  <span>{new Date(campana.fecha_fin).toLocaleDateString()}</span>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
