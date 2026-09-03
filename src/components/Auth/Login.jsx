@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth.jsx'
 import { LogIn, Mail, Lock } from 'lucide-react'
 
@@ -8,13 +9,16 @@ export default function Login({ onToggle }) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
+  const navigate = useNavigate()
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
     setLoading(true)
-    try { await login(email, password) }
-    catch (err) { setError(err.message || 'Error al iniciar sesion') }
+    try {
+      await login(email, password)
+      navigate('/')
+    } catch (err) { setError(err.message || 'Error al iniciar sesion') }
     finally { setLoading(false) }
   }
 

@@ -14,7 +14,7 @@ export default function Ajuste() {
   useEffect(() => { fetchInventario() }, [perfil])
 
   async function fetchInventario() {
-    if (!perfil) return
+    if (!perfil?.centro_id) return
     const { data: movimientos } = await supabase.from('movimientos').select('*').eq('centro_id', perfil.centro_id)
     if (movimientos) {
       const inventarioMap = {}
@@ -34,6 +34,11 @@ export default function Ajuste() {
     setError('')
     setLoading(true)
     setSuccess(false)
+    if (!perfil.centro_id) {
+      setError('No tienes un centro asignado. Contacta al coordinador.')
+      setLoading(false)
+      return
+    }
     if (!formData.motivo.trim()) {
       setError('El motivo es obligatorio para ajustes de stock')
       setLoading(false)

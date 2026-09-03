@@ -39,6 +39,16 @@ export default function EncargadoDashboard() {
     setLoading(false)
   }
 
+  if (!perfil?.centro_id) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-center">
+        <AlertTriangle className="w-12 h-12 text-yellow-500 mb-4" />
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Sin centro asignado</h2>
+        <p className="text-gray-500">No tienes un centro de acopio asignado. Contacta al coordinador.</p>
+      </div>
+    )
+  }
+
   if (loading) {
     return <div className="flex items-center justify-center h-64"><div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
   }

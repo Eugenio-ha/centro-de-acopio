@@ -14,7 +14,7 @@ export default function Merma() {
   useEffect(() => { fetchInventario() }, [perfil])
 
   async function fetchInventario() {
-    if (!perfil) return
+    if (!perfil?.centro_id) return
     const { data: movimientos } = await supabase.from('movimientos').select('*').eq('centro_id', perfil.centro_id)
     if (movimientos) {
       const inventarioMap = {}
@@ -34,6 +34,11 @@ export default function Merma() {
     setError('')
     setLoading(true)
     setSuccess(false)
+    if (!perfil.centro_id) {
+      setError('No tienes un centro asignado. Contacta al coordinador.')
+      setLoading(false)
+      return
+    }
     const stockDisponible = inventario.find(i => i.producto === formData.producto)?.stock || 0
     if (parseInt(formData.cantidad) > stockDisponible) {
       setError('Stock insuficiente. Disponible: ' + stockDisponible)

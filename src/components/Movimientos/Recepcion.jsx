@@ -19,6 +19,11 @@ export default function Recepcion() {
     setError('')
     setLoading(true)
     setSuccess(false)
+    if (!perfil.centro_id) {
+      setError('No tienes un centro asignado. Contacta al coordinador.')
+      setLoading(false)
+      return
+    }
     try {
       const motivoStr = formData.donante ? 'Donante: ' + formData.donante : 'Donacion general'
       const { error: insertError } = await supabase.from('movimientos').insert({
