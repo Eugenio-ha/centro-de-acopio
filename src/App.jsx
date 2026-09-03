@@ -15,6 +15,8 @@ import Entrega from './components/Movimientos/Entrega'
 import Merma from './components/Movimientos/Merma'
 import Transferencia from './components/Movimientos/Transferencia'
 import Ajuste from './components/Movimientos/Ajuste'
+import InstitucionDashboard from './components/Dashboard/InstitucionDashboard'
+import HistorialMovimientos from './components/Movimientos/HistorialMovimientos'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -41,6 +43,8 @@ function AppLayout() {
   
   const DashboardComponent = perfil?.rol === 'coordinador' 
     ? CoordinadorDashboard 
+    : perfil?.rol === 'institucion'
+    ? InstitucionDashboard
     : EncargadoDashboard
 
   return (
@@ -56,9 +60,10 @@ function AppLayout() {
             <Route path="/inventario" element={<ListaInventario />} />
             <Route path="/recepcion" element={<Recepcion />} />
             <Route path="/entrega" element={<Entrega />} />
-            <Route path="/merma" element={<Merma />} />
+            <Route path="/merma" element={<RoleGuard allowedRoles={['coordinador', 'encargado']}><Merma /></RoleGuard>} />
             <Route path="/transferencia" element={<RoleGuard allowedRoles={['coordinador', 'encargado']}><Transferencia /></RoleGuard>} />
             <Route path="/ajuste" element={<RoleGuard allowedRoles={['coordinador', 'encargado']}><Ajuste /></RoleGuard>} />
+            <Route path="/historial" element={<HistorialMovimientos />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>

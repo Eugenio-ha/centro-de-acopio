@@ -1,20 +1,26 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth.jsx'
+import { useCampañas } from '../../hooks/useDatabase.jsx'
 import { supabase } from '../../utils/supabase.jsx'
-import { Package, Download } from 'lucide-react'
+import { Package, Download, Filter } from 'lucide-react'
 
 export default function ListaInventario() {
   const { perfil } = useAuth()
+  const { campañas } = useCampañas()
   const [inventario, setInventario] = useState([])
   const [loading, setLoading] = useState(true)
+  const [filtroCampana, setFiltroCampana] = useState('')
 
-  useEffect(() => { fetchInventario() }, [perfil])
+  useEffect(() => { fetchInventario() }, [perfil, filtroCampana])
 
   async function fetchInventario() {
     if (!perfil) return
     let query = supabase.from('movimientos').select('*')
     if (perfil.rol !== 'coordinador' && perfil.centro_id) {
       query = query.eq('centro_id', perfil.centro_id)
+    }
+    if (filtroCampana) {
+      query = query.eq('campana_id', filtroCampana)
     }
     const { data: movimientos } = await query
     if (movimientos) {
@@ -69,6 +75,20 @@ export default function ListaInventario() {
         <button onClick={exportarCSV} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
           <Download className="w-4 h-4" />Exportar CSV
         </button>
+      </div>
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4">
+        <div className="flex items-center gap-3">
+          <Filter className="w-5 h-5 text-gray-400" />
+          <label className="text-sm font-medium text-gray-700">Filtrar por campaña:</label>
+          <select
+            value={filtroCampana}
+            onChange={(e) => setFiltroCampana(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none text-sm"
+          >
+            <option value="">Todas las campañas</option>
+            {campañas.map(c => (<option key={c.id} value={c.id}>{c.nombre}</option>))}
+          </select>
+        </div>
       </div>
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
         {inventario.length === 0 ? (

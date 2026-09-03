@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useCampañas } from '../../hooks/useDatabase.jsx'
-import { Megaphone, Plus, Calendar, X, Check } from 'lucide-react'
+import { supabase } from '../../utils/supabase.jsx'
+import { Megaphone, Plus, Calendar, X, Check, Power, Edit2 } from 'lucide-react'
 
 export default function ListaCampanas() {
-  const { campañas, loading, crearCampaña } = useCampañas()
+  const { campañas, loading, crearCampaña, refetch } = useCampañas()
   const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState(null)
   const [formData, setFormData] = useState({
     nombre: '',
     descripcion: '',
@@ -18,25 +20,52 @@ export default function ListaCampanas() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
+  function startEdit(campaña) {
+    setEditingId(campaña.id)
+    setFormData({
+      nombre: campaña.nombre,
+      descripcion: campaña.descripcion || '',
+      fecha_inicio: campaña.fecha_inicio,
+      fecha_fin: campaña.fecha_fin || ''
+    })
+    setShowForm(true)
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
     setLoadingCreate(true)
     try {
-      await crearCampaña({
-        nombre: formData.nombre,
-        descripcion: formData.descripcion,
-        fecha_inicio: formData.fecha_inicio,
-        fecha_fin: formData.fecha_fin || null,
-        activa: true
-      })
+      if (editingId) {
+        await supabase.from('campanas').update({
+          nombre: formData.nombre,
+          descripcion: formData.descripcion,
+          fecha_inicio: formData.fecha_inicio,
+          fecha_fin: formData.fecha_fin || null
+        }).eq('id', editingId)
+      } else {
+        await crearCampaña({
+          nombre: formData.nombre,
+          descripcion: formData.descripcion,
+          fecha_inicio: formData.fecha_inicio,
+          fecha_fin: formData.fecha_fin || null,
+          activa: true
+        })
+      }
       setFormData({ nombre: '', descripcion: '', fecha_inicio: '', fecha_fin: '' })
       setShowForm(false)
+      setEditingId(null)
+      refetch()
     } catch (err) {
-      setError(err.message || 'Error al crear campaña')
+      setError(err.message || 'Error al guardar campaña')
     } finally {
       setLoadingCreate(false)
     }
+  }
+
+  async function toggleActiva(campaña) {
+    await supabase.from('campanas').update({ activa: !campaña.activa }).eq('id', campaña.id)
+    refetch()
   }
 
   if (loading) {
@@ -55,7 +84,7 @@ export default function ListaCampanas() {
           <p className="text-gray-500">{campañas.length} campañas registradas</p>
         </div>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => { setShowForm(!showForm); setEditingId(null); setFormData({ nombre: '', descripcion: '', fecha_inicio: '', fecha_fin: '' }) }}
           className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
         >
           {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
@@ -65,7 +94,7 @@ export default function ListaCampanas() {
 
       {showForm && (
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Crear Campaña</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">{editingId ? 'Editar Campaña' : 'Crear Campaña'}</h3>
           {error && <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">{error}</div>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -124,7 +153,7 @@ export default function ListaCampanas() {
               ) : (
                 <>
                   <Check className="w-4 h-4" />
-                  Crear Campaña
+                  {editingId ? 'Guardar Cambios' : 'Crear Campaña'}
                 </>
               )}
             </button>
@@ -139,9 +168,15 @@ export default function ListaCampanas() {
               <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                 <Megaphone className="w-6 h-6 text-blue-600" />
               </div>
-              <span className={campaña.activa ? 'bg-green-100 text-green-800 px-2.5 py-0.5 rounded-full text-xs font-medium' : 'bg-gray-100 text-gray-800 px-2.5 py-0.5 rounded-full text-xs font-medium'}>
-                {campaña.activa ? 'Activa' : 'Inactiva'}
-              </span>
+              <div className="flex items-center gap-2">
+                <button onClick={() => startEdit(campaña)} className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors">
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button onClick={() => toggleActiva(campaña)} className={campaña.activa ? 'bg-green-100 text-green-800 px-2.5 py-0.5 rounded-full text-xs font-medium hover:bg-green-200 transition-colors flex items-center gap-1' : 'bg-gray-100 text-gray-800 px-2.5 py-0.5 rounded-full text-xs font-medium hover:bg-gray-200 transition-colors flex items-center gap-1'}>
+                  <Power className="w-3 h-3" />
+                  {campaña.activa ? 'Activa' : 'Inactiva'}
+                </button>
+              </div>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">{campaña.nombre}</h3>
             {campaña.descripcion && (

@@ -158,9 +158,36 @@ CREATE POLICY "Coordinadores pueden eliminar campanas" ON campanas
 -- POLITICAS RLS - MOVIMIENTOS
 -- ================================================
 
--- Todos pueden ver movimientos
-CREATE POLICY "Todos pueden ver movimientos" ON movimientos
-  FOR SELECT USING (true);
+-- Coordinadores pueden ver todos los movimientos
+CREATE POLICY "Coordinadores pueden ver todos los movimientos" ON movimientos
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM usuarios 
+      WHERE id = auth.uid() AND rol = 'coordinador'
+    )
+  );
+
+-- Encargados y voluntarios solo ven movimientos de su centro
+CREATE POLICY "Encargados y voluntarios ven movimientos de su centro" ON movimientos
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM usuarios 
+      WHERE id = auth.uid() 
+      AND rol IN ('encargado', 'voluntario')
+      AND centro_id = movimientos.centro_id
+    )
+  );
+
+-- Instituciones ven entregas destinadas a ellas
+CREATE POLICY "Instituciones ven sus entregas" ON movimientos
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM usuarios 
+      WHERE id = auth.uid() AND rol = 'institucion'
+    )
+    AND tipo = 'entrega' 
+    AND destino_id = auth.uid()
+  );
 
 -- Usuarios autenticados pueden crear movimientos
 CREATE POLICY "Usuarios autenticados pueden crear movimientos" ON movimientos

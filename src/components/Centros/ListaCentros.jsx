@@ -1,11 +1,17 @@
 import { useState } from 'react'
 import { useCentros } from '../../hooks/useDatabase.jsx'
-import { Building2, Plus, MapPin } from 'lucide-react'
+import { supabase } from '../../utils/supabase.jsx'
+import { Building2, Plus, MapPin, Power } from 'lucide-react'
 import FormCentro from './FormCentro.jsx'
 
 export default function ListaCentros() {
-  const { centros, loading } = useCentros()
+  const { centros, loading, refetch } = useCentros()
   const [showForm, setShowForm] = useState(false)
+
+  async function toggleActivo(centro) {
+    await supabase.from('centros').update({ activo: !centro.activo }).eq('id', centro.id)
+    refetch()
+  }
 
   if (loading) {
     return (
@@ -33,7 +39,7 @@ export default function ListaCentros() {
 
       {showForm && (
         <div className="mb-6">
-          <FormCentro onClose={() => setShowForm(false)} />
+          <FormCentro onClose={() => { setShowForm(false); refetch() }} />
         </div>
       )}
 
@@ -44,9 +50,10 @@ export default function ListaCentros() {
               <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
                 <Building2 className="w-6 h-6 text-emerald-600" />
               </div>
-              <span className={centro.activo ? 'bg-green-100 text-green-800 px-2.5 py-0.5 rounded-full text-xs font-medium' : 'bg-gray-100 text-gray-800 px-2.5 py-0.5 rounded-full text-xs font-medium'}>
+              <button onClick={() => toggleActivo(centro)} className={centro.activo ? 'bg-green-100 text-green-800 px-2.5 py-0.5 rounded-full text-xs font-medium hover:bg-green-200 transition-colors flex items-center gap-1' : 'bg-gray-100 text-gray-800 px-2.5 py-0.5 rounded-full text-xs font-medium hover:bg-gray-200 transition-colors flex items-center gap-1'}>
+                <Power className="w-3 h-3" />
                 {centro.activo ? 'Activo' : 'Inactivo'}
-              </span>
+              </button>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">{centro.nombre}</h3>
             <div className="flex items-center gap-2 text-gray-500 text-sm">

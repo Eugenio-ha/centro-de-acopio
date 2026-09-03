@@ -9,7 +9,9 @@ import {
   ArrowLeftRight,
   Settings,
   Building2,
-  Megaphone
+  Megaphone,
+  History,
+  Truck
 } from 'lucide-react'
 
 export default function Sidebar() {
@@ -21,6 +23,7 @@ export default function Sidebar() {
     { to: '/centros', icon: Building2, label: 'Centros' },
     { to: '/campanas', icon: Megaphone, label: 'Campañas' },
     { to: '/inventario', icon: Package, label: 'Inventario Global' },
+    { to: '/historial', icon: History, label: 'Historial' },
   ]
 
   const centerLinks = [
@@ -31,6 +34,7 @@ export default function Sidebar() {
     { to: '/merma', icon: AlertTriangle, label: 'Merma' },
     { to: '/transferencia', icon: ArrowLeftRight, label: 'Transferencia' },
     { to: '/ajuste', icon: Settings, label: 'Ajuste Stock' },
+    { to: '/historial', icon: History, label: 'Historial' },
   ]
 
   const volunteerLinks = [
@@ -38,10 +42,16 @@ export default function Sidebar() {
     { to: '/inventario', icon: Package, label: 'Inventario' },
     { to: '/recepcion', icon: ArrowDownCircle, label: 'Recepcion' },
     { to: '/entrega', icon: ArrowUpCircle, label: 'Entrega' },
+    { to: '/historial', icon: History, label: 'Historial' },
+  ]
+
+  const institutionLinks = [
+    { to: '/', icon: LayoutDashboard, label: 'Mis Entregas' },
   ]
 
   const links = rol === 'coordinador' ? coordinatorLinks : 
-                rol === 'voluntario' ? volunteerLinks : centerLinks
+                rol === 'voluntario' ? volunteerLinks :
+                rol === 'institucion' ? institutionLinks : centerLinks
 
   function getClassName({ isActive }) {
     return 'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ' +
