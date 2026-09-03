@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { useCampanas } from '../../hooks/useDatabase.jsx'
+import { useCampañas } from '../../hooks/useDatabase.jsx'
 import { Megaphone, Plus, Calendar, X, Check } from 'lucide-react'
 
 export default function ListaCampanas() {
-  const { campanas, loading, crearCampana } = useCampanas()
+  const { campañas, loading, crearCampaña } = useCampañas()
   const [showForm, setShowForm] = useState(false)
   const [formData, setFormData] = useState({
     nombre: '',
@@ -23,7 +23,7 @@ export default function ListaCampanas() {
     setError('')
     setLoadingCreate(true)
     try {
-      await crearCampana({
+      await crearCampaña({
         nombre: formData.nombre,
         descripcion: formData.descripcion,
         fecha_inicio: formData.fecha_inicio,
@@ -33,7 +33,7 @@ export default function ListaCampanas() {
       setFormData({ nombre: '', descripcion: '', fecha_inicio: '', fecha_fin: '' })
       setShowForm(false)
     } catch (err) {
-      setError(err.message || 'Error al crear campana')
+      setError(err.message || 'Error al crear campaña')
     } finally {
       setLoadingCreate(false)
     }
@@ -51,21 +51,21 @@ export default function ListaCampanas() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Campanas</h1>
-          <p className="text-gray-500">{campanas.length} campanas registradas</p>
+          <h1 className="text-2xl font-bold text-gray-900">Campañas</h1>
+          <p className="text-gray-500">{campañas.length} campañas registradas</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
           className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
         >
           {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-          {showForm ? 'Cancelar' : 'Nueva Campana'}
+          {showForm ? 'Cancelar' : 'Nueva Campaña'}
         </button>
       </div>
 
       {showForm && (
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Crear Campana</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Crear Campaña</h3>
           {error && <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">{error}</div>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -76,7 +76,7 @@ export default function ListaCampanas() {
                 value={formData.nombre}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                placeholder="Campana de Acopio Navidena"
+                placeholder="Campaña de Acopio Navideña"
                 required
               />
             </div>
@@ -88,7 +88,7 @@ export default function ListaCampanas() {
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                 rows="2"
-                placeholder="Descripcion de la campana..."
+                placeholder="Descripcion de la campaña..."
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -124,7 +124,7 @@ export default function ListaCampanas() {
               ) : (
                 <>
                   <Check className="w-4 h-4" />
-                  Crear Campana
+                  Crear Campaña
                 </>
               )}
             </button>
@@ -133,27 +133,27 @@ export default function ListaCampanas() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {campanas.map(campana => (
-          <div key={campana.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        {campañas.map(campaña => (
+          <div key={campaña.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-start justify-between mb-4">
               <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                 <Megaphone className="w-6 h-6 text-blue-600" />
               </div>
-              <span className={campana.activa ? 'bg-green-100 text-green-800 px-2.5 py-0.5 rounded-full text-xs font-medium' : 'bg-gray-100 text-gray-800 px-2.5 py-0.5 rounded-full text-xs font-medium'}>
-                {campana.activa ? 'Activa' : 'Inactiva'}
+              <span className={campaña.activa ? 'bg-green-100 text-green-800 px-2.5 py-0.5 rounded-full text-xs font-medium' : 'bg-gray-100 text-gray-800 px-2.5 py-0.5 rounded-full text-xs font-medium'}>
+                {campaña.activa ? 'Activa' : 'Inactiva'}
               </span>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">{campana.nombre}</h3>
-            {campana.descripcion && (
-              <p className="text-sm text-gray-500 mb-3">{campana.descripcion}</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{campaña.nombre}</h3>
+            {campaña.descripcion && (
+              <p className="text-sm text-gray-500 mb-3">{campaña.descripcion}</p>
             )}
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <Calendar className="w-4 h-4" />
-              <span>{new Date(campana.fecha_inicio).toLocaleDateString()}</span>
-              {campana.fecha_fin && (
+              <span>{new Date(campaña.fecha_inicio).toLocaleDateString()}</span>
+              {campaña.fecha_fin && (
                 <>
                   <span>-</span>
-                  <span>{new Date(campana.fecha_fin).toLocaleDateString()}</span>
+                  <span>{new Date(campaña.fecha_fin).toLocaleDateString()}</span>
                 </>
               )}
             </div>

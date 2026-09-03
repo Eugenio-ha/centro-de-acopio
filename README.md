@@ -43,7 +43,7 @@ Sistema de registro y coordinacion de centros de acopio para gestion de emergenc
 Ejecuta el script supabase-schema.sql en Supabase SQL Editor para crear:
 - Tabla de usuarios
 - Tabla de centros
-- Tabla de campanas
+- Tabla de campañas
 - Tabla de movimientos (calcula inventario)
 - Politicas RLS
 
@@ -51,7 +51,7 @@ Ejecuta el script supabase-schema.sql en Supabase SQL Editor para crear:
 
 | Rol | Permisos |
 |-----|----------|
-| Coordinador | Ver todo, crear centros/campanas |
+| Coordinador | Ver todo, crear centros/campañas |
 | Encargado | Gestionar su centro |
 | Voluntario | Registrar recepciones/entregas |
 | Institucion | Ver entregas asignadas |

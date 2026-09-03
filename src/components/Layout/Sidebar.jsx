@@ -19,7 +19,7 @@ export default function Sidebar() {
   const coordinatorLinks = [
     { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/centros', icon: Building2, label: 'Centros' },
-    { to: '/campanas', icon: Megaphone, label: 'Campanas' },
+    { to: '/campanas', icon: Megaphone, label: 'Campañas' },
     { to: '/inventario', icon: Package, label: 'Inventario Global' },
   ]
 

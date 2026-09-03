@@ -52,23 +52,23 @@ export function useMovimientos(centroId = null) {
   return { movimientos, loading, crearMovimiento, refetch: fetchMovimientos }
 }
 
-export function useCampanas() {
-  const [campanas, setCampanas] = useState([])
+export function useCampañas() {
+  const [campañas, setCampañas] = useState([])
   const [loading, setLoading] = useState(true)
 
-  async function fetchCampanas() {
+  async function fetchCampañas() {
     const { data, error } = await supabase.from('campanas').select('*').order('created_at', { ascending: false })
-    if (!error) setCampanas(data)
+    if (!error) setCampañas(data)
     setLoading(false)
   }
 
-  async function crearCampana(campana) {
-    const { data, error } = await supabase.from('campanas').insert(campana).select()
+  async function crearCampaña(campaña) {
+    const { data, error } = await supabase.from('campanas').insert(campaña).select()
     if (error) throw error
-    setCampanas([data[0], ...campanas])
+    setCampañas([data[0], ...campañas])
     return data[0]
   }
 
-  useEffect(() => { fetchCampanas() }, [])
-  return { campanas, loading, crearCampana, refetch: fetchCampanas }
+  useEffect(() => { fetchCampañas() }, [])
+  return { campañas, loading, crearCampaña, refetch: fetchCampañas }
 }

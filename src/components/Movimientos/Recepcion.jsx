@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useAuth } from '../../hooks/useAuth.jsx'
-import { useCampanas } from '../../hooks/useDatabase.jsx'
+import { useCampañas } from '../../hooks/useDatabase.jsx'
 import { supabase } from '../../utils/supabase.jsx'
 import { ArrowDownCircle, Check } from 'lucide-react'
 
 export default function Recepcion() {
   const { perfil } = useAuth()
-  const { campanas } = useCampanas()
+  const { campañas } = useCampañas()
   const [formData, setFormData] = useState({ producto: '', cantidad: '', donante: '', campana_id: '' })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -66,10 +66,10 @@ export default function Recepcion() {
               <input type="number" name="cantidad" value={formData.cantidad} onChange={handleChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" min="1" required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Campana</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Campaña</label>
               <select name="campana_id" value={formData.campana_id} onChange={handleChange} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
-                <option value="">Sin campana</option>
-                {campanas.filter(c => c.activa).map(campana => (<option key={campana.id} value={campana.id}>{campana.nombre}</option>))}
+                <option value="">Sin campaña</option>
+                {campañas.filter(c => c.activa).map(campaña => (<option key={campaña.id} value={campaña.id}>{campaña.nombre}</option>))}
               </select>
             </div>
           </div>
